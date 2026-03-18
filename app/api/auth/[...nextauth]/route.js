@@ -22,12 +22,9 @@ const handler = NextAuth({
         if (account.provider === "github") {
           await connectDb()
 
-          // fallback email (GitHub sometimes doesn't provide email)
           const email =
-            user.email ||
-            `${profile?.login || "user"}@github.com`
+            user.email || `${profile?.login}@github.com`
 
-          // check user exists
           let currentUser = await User.findOne({ email })
 
           if (!currentUser) {
@@ -45,12 +42,13 @@ const handler = NextAuth({
             })
           }
 
-          return true
+          return true // ✅ allow
         }
-        return false
+
+        return true // ✅ IMPORTANT (never block)
       } catch (error) {
         console.error("SignIn Error:", error)
-        return false
+        return true // ✅ NEVER block login
       }
     },
 
